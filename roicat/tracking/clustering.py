@@ -187,28 +187,32 @@ class Clusterer:
             s_sf=self.s_sf,
             s_NN=self.s_NN_z,
             s_SWT=self.s_SWT_z,
+            s_sesh=None,
             **kwargs_makeConjunctiveDistanceMatrix
         )
         dens_same_crop, dens_same, dens_diff, dens_all, edges, d_crossover = self._separate_diffSame_distributions(dConj)
 
-        ssf, snn, sswt = self.s_sf.copy(), self.s_NN_z.copy(), self.s_SWT_z.copy()
-        ssf.data[ssf.data == 0] = 1e-10
-        snn.data[snn.data == 0] = 1e-10
-        sswt.data[sswt.data == 0] = 1e-10
+        ssf, snn, sswt, ssesh = self.s_sf.copy(), self.s_NN_z.copy(), self.s_SWT_z.copy(), self.s_sesh.copy()
+        # ssf.data[ssf.data == 0] = 1e-10
+        # snn.data[snn.data == 0] = 1e-10
+        # sswt.data[sswt.data == 0] = 1e-10
 
         self.d_cutoff = d_crossover if d_cutoff is None else d_cutoff
-        self.graph_pruned = dConj > self.d_cutoff
+        self.graph_pruned = dConj.copy()
+        self.graph_pruned.data = self.graph_pruned.data < self.d_cutoff
         self.graph_pruned.eliminate_zeros()
         
         def prune(s, graph_pruned):
             if s is None:
                 return None
+            print(s.nnz)
             s_pruned = s.copy()
-            s_pruned[graph_pruned] = 0
-            s_pruned.eliminate_zeros()
+            s_pruned = scipy.sparse.csr_matrix(graph_pruned.shape)
+            s_pruned[graph_pruned] = s[graph_pruned]
+            s_pruned = s_pruned.tocsr()
             return s_pruned
 
-        self.s_sf_pruned, self.s_NN_pruned, self.s_SWT_pruned = tuple([prune(s, self.graph_pruned) for s in [ssf, snn, sswt]])
+        self.s_sf_pruned, self.s_NN_pruned, self.s_SWT_pruned, self.s_sesh_pruned = tuple([prune(s, self.graph_pruned) for s in [ssf, snn, sswt, ssesh]])
 
     def fit(self,
         session_bool,
@@ -291,6 +295,7 @@ class Clusterer:
                 s_sf=self.s_sf_pruned,
                 s_NN=self.s_NN_pruned,
                 s_SWT=self.s_SWT_pruned,
+                s_sesh=self.s_sesh_pruned,
                 **kwargs_makeConjunctiveDistanceMatrix
             )
 
@@ -464,6 +469,7 @@ class Clusterer:
                 s_sf=self.s_sf_pruned,
                 s_NN=self.s_NN_pruned,
                 s_SWT=self.s_SWT_pruned,
+                s_sesh=self.s_sesh_pruned,
                 **kwargs_makeConjunctiveDistanceMatrix
             )
 
@@ -537,6 +543,7 @@ class Clusterer:
         s_sf=None,
         s_NN=None,
         s_SWT=None,
+        s_sesh=None,
         power_SF=1,
         power_NN=1,
         power_SWT=1,
@@ -595,10 +602,13 @@ class Clusterer:
         sConj_data = self._pNorm(
             s_list=[sSF_data, sNN_data, sSWT_data],
             p=p_norm,
-        ) * self.s_sesh.data
+        )
+        sConj_data = sConj_data * s_sesh.data if s_sesh is not None else sConj_data
+        # sConj_data = sConj_data * np.logical_not(s_sesh.data) if s_sesh is not None else sConj_data
 
         dConj = s_sf.copy()
         dConj.data = sConj_data.numpy()
+        # dConj = dConj.multiply(s_sesh) if s_sesh is not None else dConj
         # dConj.eliminate_zeros()
         dConj.data = 1 - dConj.data
 
@@ -678,6 +688,7 @@ class Clusterer:
             s_sf=self.s_sf,
             s_NN=self.s_NN_z,
             s_SWT=self.s_SWT_z,
+            s_sesh=self.s_sesh,
             **kwargs_makeConjunctiveDistanceMatrix
         )
 
@@ -719,6 +730,7 @@ class Clusterer:
             s_sf=self.s_sf,
             s_NN=self.s_NN_z,
             s_SWT=self.s_SWT_z,
+            s_sesh=None,
             **kwargs
         )
         dens_same_crop, dens_same, dens_diff, dens_all, edges, d_crossover = self._separate_diffSame_distributions(dConj)
@@ -836,6 +848,7 @@ class Clusterer:
             s_sf=self.s_sf,
             s_NN=self.s_NN_z,
             s_SWT=self.s_SWT_z,
+            s_sesh=None,
             power_SF=power_SF,
             power_NN=power_NN,
             power_SWT=power_SWT,
