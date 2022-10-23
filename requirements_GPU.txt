@@ -22,3 +22,6 @@ paramiko
 jupyter
 PyYAML
 umap-learn
+optuna
+hdbscan
+joblib==1.1.0

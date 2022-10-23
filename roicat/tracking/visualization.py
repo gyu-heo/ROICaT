@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 from ipywidgets import interact, widgets
 
 import numpy as np
-import sparse
 import scipy.sparse
 
 import copy

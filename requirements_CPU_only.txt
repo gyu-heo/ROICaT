@@ -22,3 +22,5 @@ paramiko
 jupyter
 PyYAML
 umap-learn
+optuna
+hdbscan==0.8.27

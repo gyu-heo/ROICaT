@@ -205,7 +205,6 @@ class Clusterer:
         def prune(s, graph_pruned):
             if s is None:
                 return None
-            print(s.nnz)
             s_pruned = s.copy()
             s_pruned = scipy.sparse.csr_matrix(graph_pruned.shape)
             s_pruned[graph_pruned] = s[graph_pruned]
@@ -603,12 +602,12 @@ class Clusterer:
             s_list=[sSF_data, sNN_data, sSWT_data],
             p=p_norm,
         )
-        sConj_data = sConj_data * s_sesh.data if s_sesh is not None else sConj_data
+        # sConj_data = sConj_data * s_sesh.data if s_sesh is not None else sConj_data
         # sConj_data = sConj_data * np.logical_not(s_sesh.data) if s_sesh is not None else sConj_data
 
         dConj = s_sf.copy()
         dConj.data = sConj_data.numpy()
-        # dConj = dConj.multiply(s_sesh) if s_sesh is not None else dConj
+        dConj = dConj.multiply(s_sesh) if s_sesh is not None else dConj
         # dConj.eliminate_zeros()
         dConj.data = 1 - dConj.data
 
