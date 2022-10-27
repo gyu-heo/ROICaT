@@ -236,6 +236,15 @@ class Clusterer:
     ):
         """
         Fit clustering using the ROICaT clustering algorithm.
+        The idea here is to use HDBSCAN but avoid having clusters with
+         multiple ROIs from the same session. This is accomplished by
+         repeating three steps:
+            1. Fit HDBSCAN to the data
+            2. Identify clusters that have multiple ROIs from the same session
+             and walk back down the dendrogram until those clusters are split
+             up into non-violating clusters.
+            3. Disconnect graph edges between ROIs within each new cluster and
+             all other ROIs outside the cluster that are from the same session.
 
         Args:
             session_bool (np.ndarray of bool):
