@@ -235,7 +235,7 @@ class Clusterer:
         d_step=0.05,
     ):
         """
-        Fit clustering using the ROICaT clustering algorithm.
+        Fit clustering using a modified HDBSCAN clustering algorithm.
         The idea here is to use HDBSCAN but avoid having clusters with
          multiple ROIs from the same session. This is accomplished by
          repeating three steps:
