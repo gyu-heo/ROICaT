@@ -447,7 +447,7 @@ class Clusterer:
             https://github.com/flatironinstitute/CaImAn
             https://github.com/flatironinstitute/CaImAn/blob/master/caiman/base/rois.py
         """
-        print(f"Clustering with CaImAn's iterative Hungarian algorithm method...") if self._verbose else None
+        print(f"Clustering with CaImAn's sequential Hungarian algorithm method...") if self._verbose else None
         def find_matches(D_s):
             # todo todocument
 
@@ -701,7 +701,7 @@ class Clusterer:
         )
 
         ## subsample similarities for plotting
-        idx_rand = np.floor(np.random.rand(min(max_samples, len(sSF_data))) * len(sSF_data)).astype(int)
+        idx_rand = np.floor(np.random.rand(min(max_samples, len(dConj.data))) * len(dConj.data)).astype(int)
         ssf_sub = sSF_data[idx_rand]
         snn_sub = sNN_data[idx_rand]
         sswt_sub = sSWT_data[idx_rand] if sSWT_data is not None else None
