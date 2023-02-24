@@ -186,8 +186,6 @@ class ROInet_embedder:
             verbose=self._verbose,
         )
 
-        print(paths_extracted)
-
         ## Find network files
         if names_networkFiles is None:
             names_networkFiles = {
