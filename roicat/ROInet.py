@@ -186,6 +186,8 @@ class ROInet_embedder:
             verbose=self._verbose,
         )
 
+        print(paths_extracted)
+
         ## Find network files
         if names_networkFiles is None:
             names_networkFiles = {
@@ -236,6 +238,8 @@ class ROInet_embedder:
         transforms=None,
         img_size_out=(224, 224),
         jit_script_transforms=True,
+        
+        resize_bool=True,
     ):
         """
         Generate a dataloader for the given ROI_images.
@@ -286,7 +290,11 @@ class ROInet_embedder:
         print('Starting: resizing ROIs') if self._verbose else None
         
         
-        sf_rs = [self.resize_ROIs(rois, um_per_pixel) for rois in ROI_images]
+#         sf_rs = [self.resize_ROIs(rois, um_per_pixel) for rois in ROI_images]
+        if resize_bool:
+            sf_rs = [self.resize_ROIs(rois, um_per_pixel) for rois in ROI_images]
+        else:
+            sf_rs = ROI_images
         
         
         ROI_images_cat = np.concatenate(ROI_images, axis=0)
@@ -401,6 +409,7 @@ class ROInet_embedder:
         """
         print(f'starting: dumping latents')
         
+        Path(latent_folder_out).mkdir(parents=True,exist_ok=True)
         for icopy in trange(start_copy_num, start_copy_num+num_copies):
             augmented_lst = []
             for data in tqdm(self.dataloader, mininterval=5):
